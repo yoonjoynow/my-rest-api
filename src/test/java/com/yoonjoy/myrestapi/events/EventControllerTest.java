@@ -40,6 +40,43 @@ public class EventControllerTest {
 
     @Test
     public void createEvent() throws Exception   {
+        EventDto eventDto = EventDto.builder()
+                .name("Yoon Soyi")
+                .description("is beautiful!!!!")
+                .beginEnrollmentDateTime(LocalDateTime.of(2000, 6, 13, 12, 30))
+                .closeEnrollmentDateTime(LocalDateTime.of(2020, 9, 27, 11, 10))
+                .beginEventDateTime(LocalDateTime.of(1996, 4, 4, 4, 4))
+                .endEventDateTime(LocalDateTime.of(2021, 3, 30, 15, 30))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("트라펠리스 104동 3202호")
+                .build();
+
+        // eventRepository는 Mock객체이므로 모든 메소드에 대한 리턴값이 null이다.
+        // 따라서 제대로된 값을 받아오기 위해선 다음과 같은 행위가 필요하다.
+        // eventRepository의 save가 호출되면 event를 리턴하라
+        // 이러한 행위 (~~한 경우엔 ~~하게 동작하라)를 스터빙(stubbing)이라고 한다.
+        // event.setId(10);
+        // Mockito.when(eventRepository.save(event)).thenReturn(event);
+
+        mockMvc.perform(post("/api/events/")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaTypes.HAL_JSON)
+                    // event 객체를 objectMapper의 writeValueAsString를 통해 json문자열로 변환해 요청 본문에 담는다
+                    .content(objectMapper.writeValueAsString(eventDto)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(header().exists(HttpHeaders.LOCATION))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
+                .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("free").value(Matchers.not(true)))
+                .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()));
+    }
+
+    @Test
+    public void createEvent_Bad_Request() throws Exception   {
         Event event = Event.builder()
                 .id(100)
                 .name("Yoon Soyi")
@@ -57,26 +94,13 @@ public class EventControllerTest {
                 .eventStatus(EventStatus.PUBLISHED)
                 .build();
 
-        // eventRepository는 Mock객체이므로 모든 메소드에 대한 리턴값이 null이다.
-        // 따라서 제대로된 값을 받아오기 위해선 다음과 같은 행위가 필요하다.
-        // eventRepository의 save가 호출되면 event를 리턴하라
-        // 이러한 행위 (~~한 경우엔 ~~하게 동작하라)를 스터빙(stubbing)이라고 한다.
-        // event.setId(10);
-        // Mockito.when(eventRepository.save(event)).thenReturn(event);
-
         mockMvc.perform(post("/api/events/")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaTypes.HAL_JSON)
-                    // event 객체를 objectMapper의 writeValueAsString를 통해 json문자열로 변환해 요청 본문에 담는다
-                    .content(objectMapper.writeValueAsString(event)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaTypes.HAL_JSON)
+                // event 객체를 objectMapper의 writeValueAsString를 통해 json문자열로 변환해 요청 본문에 담는다
+                .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("id").exists())
-                .andExpect(header().exists(HttpHeaders.LOCATION))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
-                .andExpect(jsonPath("id").value(Matchers.not(100)))
-                .andExpect(jsonPath("free").value(Matchers.not(true)))
-                .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()));
+                .andExpect(status().isBadRequest());
     }
 
 }
