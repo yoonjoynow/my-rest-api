@@ -2,6 +2,7 @@ package com.yoonjoy.myrestapi.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -39,6 +40,7 @@ public class EventControllerTest {
     //EventRepository eventRepository;
 
     @Test
+    @DisplayName("정상적으로 이벤트를 생성하는 테스트")
     public void createEvent() throws Exception   {
         EventDto eventDto = EventDto.builder()
                 .name("Yoon Soyi")
@@ -76,6 +78,7 @@ public class EventControllerTest {
     }
 
     @Test
+    @DisplayName("입력받을 수 없는 값을 받은 경우에 에러가 발생하는 테스트")
     public void createEvent_Bad_Request() throws Exception   {
         Event event = Event.builder()
                 .id(100)
@@ -100,6 +103,39 @@ public class EventControllerTest {
                 // event 객체를 objectMapper의 writeValueAsString를 통해 json문자열로 변환해 요청 본문에 담는다
                 .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("입력값이 비어있는 경우 에러가 발생하는 테스트")
+    public void createEvent_Bad_Request_Empty_Input() throws Exception {
+        EventDto eventDto = EventDto.builder().build();
+
+        this.mockMvc.perform(post("/api/events/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(eventDto)))
+                    .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("입력값이 잘못된 경우 에러가 발생하는 테스트")
+    public void createEvent_Bad_Request_Wrong_Input() throws Exception {
+        EventDto eventDto = EventDto.builder()
+                .name("Yoon Soyi")
+                .description("is beautiful!!!!")
+                .beginEnrollmentDateTime(LocalDateTime.of(2000, 6, 13, 12, 30))
+                .closeEnrollmentDateTime(LocalDateTime.of(1870, 9, 27, 11, 10))
+                .beginEventDateTime(LocalDateTime.of(1996, 4, 4, 4, 4))
+                .endEventDateTime(LocalDateTime.of(2021, 3, 30, 15, 30))
+                .basePrice(1000)
+                .maxPrice(40)
+                .limitOfEnrollment(100)
+                .location("트라펠리스 104동 3202호")
+                .build();
+
+        this.mockMvc.perform(post("/api/events/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(eventDto)))
                 .andExpect(status().isBadRequest());
     }
 
