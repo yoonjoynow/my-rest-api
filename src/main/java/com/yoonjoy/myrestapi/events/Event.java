@@ -26,4 +26,8 @@ public class Event {
     private boolean isFree;
     private EventStatus eventStatus;
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
 }
