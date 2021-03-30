@@ -2,15 +2,17 @@ package com.yoonjoy.myrestapi.events;
 
 import lombok.*;
 
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
+@Entity
 public class Event {
 
+    @Id @GeneratedValue
     private Integer id;
     private String name;
     private String description;
@@ -24,6 +26,7 @@ public class Event {
     private int limitOfEnrollment;
     private boolean isOffline;
     private boolean isFree;
+    @Enumerated(EnumType.STRING)
     private EventStatus eventStatus;
 
     public void setId(int id) {
