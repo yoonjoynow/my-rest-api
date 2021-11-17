@@ -1,17 +1,36 @@
 package com.yoonjoy.myrestapi.events;
 
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 @Component
-public class EventValidator {
+public class EventValidator implements Validator {
 
-    public void validate(EventDto eventDto, Errors errors) {
-        if (eventDto.getBasePrice() > eventDto.getMaxPrice() && eventDto.getMaxPrice() != 0) {
-            errors.rejectValue("basePrice", "wrongValue", "BasePrice의 값이 이상합니다.");
-            errors.rejectValue("basePrice", "wrongValue", "MaxPrice의 값이 이상합니다.");
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return Event.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        EventDto.Create dto = (EventDto.Create) target;
+        if (dto.getBasePrice() > dto.getMaxPrice() && dto.getMaxPrice() != 0) {
+//            errors.rejectValue("basePrice", "wrongValue", "BasePrices is wrong");
+//            errors.rejectValue("maxPrice", "wrongValue", "BasePrices is wrong");
+            errors.reject("wrongPrices", "value of prices are wrong");
         }
 
-        //TODO 나머지 데이터들도 검증이 필요함
+        LocalDateTime endEventDateTime = dto.getEndEventDateTime();
+        LocalDateTime beginEventDateTime = dto.getBeginEventDateTime();
+        LocalDateTime closeEnrollmentDateTime = dto.getCloseEnrollmentDateTime();
+
+        if (endEventDateTime.isBefore(beginEventDateTime) ||
+            endEventDateTime.isBefore(closeEnrollmentDateTime) ||
+            endEventDateTime.isBefore(dto.getBeginEnrollmentDateTime())) {
+            errors.rejectValue("endEventDateTime", "wrongValue", "endEventDateTime is wrong");
+        }
     }
+
 }
