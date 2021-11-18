@@ -12,6 +12,7 @@ public class ErrorSerializer extends JsonSerializer<Errors> {
 
     @Override
     public void serialize(Errors errors, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        gen.writeFieldName("errors");
         gen.writeStartArray();
         setFieldsErrors(errors, gen);
         setGlobalErrors(errors, gen);

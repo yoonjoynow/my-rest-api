@@ -1,7 +1,10 @@
 package com.yoonjoy.myrestapi.events;
 
+import com.yoonjoy.myrestapi.error.ErrorResource;
+import com.yoonjoy.myrestapi.index.IndexController;
 import java.net.URI;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.validation.Valid;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Controller
 @RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_VALUE)
@@ -46,11 +50,13 @@ public class EventController {
         eventModel.add(linkBuilder.slash(savedEvent.getId()).withSelfRel());
         eventModel.add(linkBuilder.withRel("query-events"));
         eventModel.add(linkBuilder.withRel("update-event"));
-
+        eventModel.add(Link.of("/docs/index.html#resources-events-create").withRel("profile"));
         return ResponseEntity.created(createdUri).body(eventModel);
     }
 
     private ResponseEntity<?> badRequest(Errors errors) {
-        return ResponseEntity.badRequest().body(errors);
+//        EntityModel<Errors> errorModel = EntityModel.of(errors);
+//        errorModel.add(linkTo(methodOn(IndexController.class).index()).withRel("index"));
+        return ResponseEntity.badRequest().body(ErrorResource.modelOf(errors));
     }
 }
