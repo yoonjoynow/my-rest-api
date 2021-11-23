@@ -1,4 +1,4 @@
-package com.yoonjoy.myrestapi.error;
+package com.yoonjoy.myrestapi.global.error;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -23,14 +23,14 @@ public class ErrorSerializer extends JsonSerializer<Errors> {
         errors.getFieldErrors().forEach(error -> {
             try {
                 gen.writeStartObject();
-                gen.writeStringField("field", error.getField());
-                gen.writeStringField("objectName", error.getObjectName());
-                gen.writeStringField("code", error.getCode());
-                gen.writeStringField("defaultMessage", error.getDefaultMessage());
-                Object rejectedValue = error.getRejectedValue();
-                if (rejectedValue != null) {
-                    gen.writeStringField("rejectedValue", rejectedValue.toString());
-                }
+                    gen.writeStringField("field", error.getField());
+                    gen.writeStringField("objectName", error.getObjectName());
+                    gen.writeStringField("code", error.getCode());
+                    gen.writeStringField("defaultMessage", error.getDefaultMessage());
+                    Object rejectedValue = error.getRejectedValue();
+                    if (rejectedValue != null) {
+                        gen.writeStringField("rejectedValue", rejectedValue.toString());
+                    }
                 gen.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -42,9 +42,9 @@ public class ErrorSerializer extends JsonSerializer<Errors> {
         errors.getGlobalErrors().forEach(error -> {
             try {
                 gen.writeStartObject();
-                gen.writeStringField("objectName", error.getObjectName());
-                gen.writeStringField("code", error.getCode());
-                gen.writeStringField("defaultMessage", error.getDefaultMessage());
+                    gen.writeStringField("objectName", error.getObjectName());
+                    gen.writeStringField("code", error.getCode());
+                    gen.writeStringField("defaultMessage", error.getDefaultMessage());
                 gen.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();

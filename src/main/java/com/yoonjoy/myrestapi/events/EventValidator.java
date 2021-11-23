@@ -1,9 +1,12 @@
 package com.yoonjoy.myrestapi.events;
 
+import com.yoonjoy.myrestapi.global.error.exception.InvalidValueException;
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 @Component
 public class EventValidator implements Validator {

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.modelmapper.internal.util.Assert;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -60,15 +61,11 @@ public class Event {
     }
 
     private void checkFree() {
-        if (this.basePrice == 0 && this.maxPrice == 0) {
-            this.free = true;
-        }
+        this.free = this.basePrice == 0 && this.maxPrice == 0;
     }
 
     private void checkOffline() {
-        if (this.location != null || this.location.isBlank()) {
-            this.offline = true;
-        }
+        this.offline = this.location != null && !this.location.isBlank();
     }
 
 }
